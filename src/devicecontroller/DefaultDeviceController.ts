@@ -555,6 +555,10 @@ export default class DefaultDeviceController implements DeviceControllerBasedMed
           return (deviceMediaTrackConstraints.deviceId as ConstrainDOMStringParameters)
             .exact as string;
         }
+      } else {
+        if (deviceMediaTrackConstraints.deviceId as string) {
+          return deviceMediaTrackConstraints.deviceId as string;
+        }
       }
     }
     return '';
@@ -728,7 +732,11 @@ export default class DefaultDeviceController implements DeviceControllerBasedMed
     if (device === null) {
       return null;
     } else if (typeof device === 'string') {
-      trackConstraints.deviceId = { exact: device };
+      if (this.browserBehavior.requiresNoExactMediaStreamConstraints()) {
+        trackConstraints.deviceId = device;
+      } else {
+        trackConstraints.deviceId = { exact: device };
+      }
     } else if (stream) {
       // @ts-ignore - create a fake track constraint using the stream id
       trackConstraints.streamId = stream.id;
